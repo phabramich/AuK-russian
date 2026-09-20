@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: devin
+Date: Sat, 19 Sep 2026 00:00:00 +0000
+Subject: [PATCH] train AuK-Flash student on its distilled 4-point t-grid
+
+Adds t_sampling="flash_grid": during fine-tuning, t is drawn only from
+the 4 t-points the distilled student is ever evaluated at during
+inference (endpoint 1.0 excluded). Plain CFM fine-tuning samples t
+continuously and un-distills the student.
+
+Apply on upstream commit e3828bdac1712bbf7bcb3a2a01eec6fa5168fe32:
+    git apply finetune/patches/0001-flash-grid-training.patch
+---
+ src/auk/model/cfm_edit.py | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/auk/model/cfm_edit.py b/src/auk/model/cfm_edit.py
+index 0000000..0000000 100644
+--- a/src/auk/model/cfm_edit.py
++++ b/src/auk/model/cfm_edit.py
+@@ -36,7 +36,7 @@ class CFMEdit(nn.Module):
+         odeint_kwargs: dict = dict(method="euler"),  # 'euler' | 'midpoint'
+         audio_drop_prob: float = 0.3,
+         cond_drop_prob: float = 0.2,
+-        t_sampling: str = "uniform",  # 'uniform' | 'logistic_normal'
++        t_sampling: str = "uniform",  # 'uniform' | 'logistic_normal' | 'flash_grid'
+         P_mean: float = -0.8,
+         P_std: float = 0.8,
+         **_ignored,  # tolerate extra config keys (e.g. legacy schedule fields)
+@@ -79,6 +79,14 @@ class CFMEdit(nn.Module):
+         elif self.t_sampling == "logistic_normal":
+             z = torch.randn((batch,), dtype=dtype, device=device) * self.P_std + self.P_mean
+             return torch.sigmoid(z)
++        elif self.t_sampling == "flash_grid":
++            # AuK-Flash student: train only at the distilled t-points the
++            # 4-step inference grid evaluates (endpoint 1.0 is never seen).
++            grid = torch.tensor(
++                [0.0, 0.07612049579620361, 0.2928932309150696, 0.6173166036605835],
++                dtype=dtype, device=device,
++            )
++            return grid[torch.randint(0, len(grid), (batch,), device=device)]
+         else:
+             raise ValueError(f"Unknown t_sampling: {self.t_sampling}")
+ 
+-- 
+2.39.0

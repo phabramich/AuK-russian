@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLX-AuK vs 官方原版 Demo 全量对比与 RTF 评测看板</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --card-border: #30363d;
+      --text: #f0f6fc;
+      --text-muted: #8b949e;
+      --accent: #2f81f7;
+      --accent-hover: #58a6ff;
+      --green-bg: #0e3b1c;
+      --green-text: #3fb950;
+      --blue-bg: #112d5e;
+      --blue-text: #58a6ff;
+      --orange-bg: #4d2b09;
+      --orange-text: #d29922;
+      --tag-bg: #21262d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+    .header {
+      background: linear-gradient(180deg, #161b22 0%, #0d1117 100%);
+      border-bottom: 1px solid var(--card-border);
+      padding: 36px 24px 28px;
+      text-align: center;
+    }
+    .title-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .badge-primary {
+      background: var(--blue-bg);
+      color: var(--blue-text);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid rgba(56, 139, 253, 0.4);
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 820px;
+      margin: 0 auto 20px;
+    }
+    .stats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .stat-pill {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 130px;
+    }
+    .stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-hover);
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+    .nav-bar {
+      position: sticky;
+      top: 0;
+      background: rgba(13, 17, 23, 0.96);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      padding: 12px 0 14px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+    }
+    .pills-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .pill-btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .pill-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-hover);
+    }
+    .pill-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .subgroup-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .sub-pill-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sub-pill-btn:hover {
+      color: var(--text);
+      background: var(--tag-bg);
+    }
+    .sub-pill-btn.active {
+      background: var(--tag-bg);
+      color: var(--accent-hover);
+      border-color: var(--card-border);
+      font-weight: 600;
+    }
+    .search-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1;
+      max-width: 420px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .refresh-btn {
+      background: #238636;
+      color: #fff;
+      border: 1px solid rgba(240, 246, 252, 0.1);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .refresh-btn:hover {
+      background: #2ea043;
+    }
+    .sample-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      transition: border-color 0.15s ease;
+    }
+    .card:hover {
+      border-color: #58a6ff;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .tag-rtf-good {
+      background: var(--green-bg);
+      color: var(--green-text);
+      border: 1px solid rgba(63, 185, 80, 0.4);
+    }
+    .tag-rtf-ok {
+      background: var(--blue-bg);
+      color: var(--blue-text);
+      border: 1px solid rgba(88, 166, 255, 0.4);
+    }
+    .tag-rtf-warn {
+      background: var(--orange-bg);
+      color: var(--orange-text);
+      border: 1px solid rgba(210, 153, 34, 0.4);
+    }
+    .tag-neutral {
+      background: var(--tag-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+    }
+    .prompt-box {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #c9d1d9;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .prompt-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .prompt-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #8b949e;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .prompt-label-badge {
+      font-size: 10px;
+      background: #1f6feb22;
+      color: #58a6ff;
+      border: 1px solid #1f6feb55;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .prompt-content {
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+    .prompt-text-highlight {
+      color: #e6edf3;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    mark {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+    .tr-add {
+      background: rgba(46, 160, 67, 0.22);
+      color: #3fb950;
+      border: 1px solid rgba(46, 160, 67, 0.4);
+      font-weight: 600;
+    }
+    .tr-del {
+      background: rgba(248, 81, 73, 0.20);
+      color: #f85149;
+      border: 1px solid rgba(248, 81, 73, 0.4);
+      text-decoration: line-through;
+      text-decoration-color: #f85149;
+    }
+    .tr-chg {
+      background: rgba(56, 139, 253, 0.18);
+      color: #58a6ff;
+      border: 1px solid rgba(56, 139, 253, 0.4);
+      padding: 2px 8px;
+    }
+    .tr-chg s {
+      color: #f85149;
+      text-decoration: line-through;
+      margin-right: 4px;
+    }
+    .tr-chg b {
+      color: #3fb950;
+      font-weight: 700;
+    }
+
+    .view-mode-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+      background: #161b22;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 16px;
+    }
+    .view-mode-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #c9d1d9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .view-pill-group {
+      display: inline-flex;
+      background: #0d1117;
+      border-radius: 20px;
+      padding: 2px;
+      border: 1px solid var(--card-border);
+    }
+    .view-pill-btn {
+      padding: 6px 14px;
+      border-radius: 18px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .view-pill-btn:hover {
+      color: #f0f6fc;
+    }
+    .view-pill-btn.active {
+      background: #8957e5;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(137, 87, 229, 0.4);
+    }
+    .view-pill-btn.active.flash {
+      background: #238636;
+      box-shadow: 0 2px 8px rgba(35, 134, 54, 0.4);
+    }
+    .view-pill-btn.active.base {
+      background: #1f6feb;
+      box-shadow: 0 2px 8px rgba(31, 111, 235, 0.4);
+    }
+
+    .audio-comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .audio-slot {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 10px 12px;
+      transition: border-color 0.2s ease;
+    }
+    .audio-slot:hover {
+      border-color: #58a6ff66;
+    }
+    .slot-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      min-height: 22px;
+    }
+    .slot-title {
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .slot-title.src { color: #8b949e; }
+    .slot-title.official { color: #f0883e; }
+    .slot-title.mlx { color: #3fb950; }
+    .slot-title.mlx-flash { color: #3fb950; }
+    .slot-title.mlx-base { color: #58a6ff; }
+    .slot-meta-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .slot-meta-badge.flash {
+      background: rgba(46, 160, 67, 0.15);
+      color: #3fb950;
+      border: 1px solid rgba(46, 160, 67, 0.3);
+    }
+    .slot-meta-badge.base {
+      background: rgba(56, 139, 253, 0.15);
+      color: #58a6ff;
+      border: 1px solid rgba(56, 139, 253, 0.3);
+    }
+    .tag-rtf-blue {
+      background: var(--blue-bg);
+      color: var(--blue-text);
+      border: 1px solid rgba(88, 166, 255, 0.4);
+    }
+    audio {
+      width: 100%;
+      height: 38px;
+      outline: none;
+      border-radius: 6px;
+    }
+    .multi-outputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .chip-btn {
+      font-size: 12px;
+      background: #21262d;
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
+      padding: 3px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+    .chip-btn:hover {
+      border-color: #58a6ff;
+      color: #f0f6fc;
+    }
+    .chip-btn.active {
+      background: #1f6feb;
+      color: #fff;
+      border-color: #1f6feb;
+      font-weight: 600;
+    }
+    .footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 40px;
+    }
+    .footer a {
+      color: var(--accent-hover);
+      text-decoration: none;
+    }
+
+    .repo-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin: 16px auto 0;
+      flex-wrap: wrap;
+    }
+    .repo-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .github-btn {
+      background: #238636;
+      color: #ffffff;
+      border: 1px solid rgba(240, 246, 252, 0.1);
+      box-shadow: 0 2px 8px rgba(35, 134, 54, 0.35);
+    }
+    .github-btn:hover {
+      background: #2ea043;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(35, 134, 54, 0.55);
+    }
+    .hf-btn {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid var(--card-border);
+    }
+    .hf-btn:hover {
+      background: #30363d;
+      color: #f0f6fc;
+      border-color: #58a6ff;
+      transform: translateY(-1px);
+    }
+    .model-selector-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 18px auto 0;
+      background: rgba(22, 27, 34, 0.7);
+      border: 1px solid var(--card-border);
+      padding: 6px 16px;
+      border-radius: 30px;
+      width: fit-content;
+    }
+    .model-pill-group {
+      display: inline-flex;
+      background: #0d1117;
+      border-radius: 20px;
+      padding: 2px;
+      border: 1px solid var(--card-border);
+    }
+    .model-pill-btn {
+      padding: 6px 16px;
+      border-radius: 18px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .model-pill-btn:hover {
+      color: #f0f6fc;
+    }
+    .model-pill-btn.active {
+      background: #238636;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(35, 134, 54, 0.4);
+    }
+    .model-pill-btn.active.base {
+      background: #1f6feb;
+      box-shadow: 0 2px 8px rgba(31, 111, 235, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="title-row">
+      <span class="badge-primary">Apple Silicon MLX</span>
+      <h1>MLX-AuK 官方 Demo 全量对比与 RTF 评测看板</h1>
+    </div>
+    <p class="subtitle">
+      1:1 复刻腾讯混元 AuK 统一语音大模型。在本地 Apple Silicon (128GB Unified Memory) 跑通
+      auk-project.github.io 全部 5 大分类家族、16 个功能组的 62 个完整测试样本，提供参考输入原音频、官方原版输出与 MLX-AuK 本地生成音频的无缝 A/B 对比试听。
+    </p>
+    <div class="repo-links">
+      <a href="https://github.com/vanch007/mlx-AuK" target="_blank" class="repo-btn github-btn">
+        <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: -2px; margin-right: 6px;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+        GitHub 源码仓库 (vanch007/mlx-AuK)
+      </a>
+      <a href="https://huggingface.co/vanch007/AuK-Flash-MLX" target="_blank" class="repo-btn hf-btn">
+        🤗 Flash 权重 (5.7GB)
+      </a>
+      <a href="https://huggingface.co/vanch007/AuK-Base-MLX" target="_blank" class="repo-btn hf-btn">
+        🤗 Base 权重 (5.7GB)
+      </a>
+      <a href="https://huggingface.co/vanch007/AuK-Flash-MLX-8bit" target="_blank" class="repo-btn hf-btn">
+        🗜️ 8-Bit 量化版
+      </a>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-pill">
+        <span class="stat-val">62 / 62</span>
+        <span class="stat-label">官方用例 100% 通过</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-val">Flash: 0.542 / Base: 4.85</span>
+        <span class="stat-label">全量双模型 RTF (Flash超实时 / Base高保真)</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-val">1.85x</span>
+        <span class="stat-label">端到端超实时生成倍速</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-val">双轨同步</span>
+        <span class="stat-label">官方原版与 MLX 编辑同步切轨</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-val">Metal GPU</span>
+        <span class="stat-label">Apple Silicon 原生加速</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-bar">
+    <div class="pills-group" id="family-pills">
+      <button class="pill-btn active" data-family="all">全部用例 (62)</button>
+    </div>
+    <div class="subgroup-pills" id="group-pills"></div>
+  </div>
+
+  <main class="container">
+    <div class="view-mode-bar">
+      <div class="view-mode-title">
+        <span>🎧 试听对比模式:</span>
+      </div>
+      <div class="view-pill-group">
+        <button class="view-pill-btn active" id="btn-mode-all" onclick="switchViewMode('all')">全量 4 轨并列对比 (原音 + 官方原版 + MLX-Flash + MLX-Base)</button>
+        <button class="view-pill-btn flash" id="btn-mode-flash" onclick="switchViewMode('flash')">⚡ 仅 MLX-Flash 对比 (4步极速)</button>
+        <button class="view-pill-btn base" id="btn-mode-base" onclick="switchViewMode('base')">🎯 仅 MLX-Base 对比 (32步高保真)</button>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <input type="text" class="search-input" id="search-input" placeholder="搜索任务、编辑动作、台词或样本 ID (例如: Replace, Add, 曾两次进谒, 枭雄)...">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:13px; color:var(--text-muted);" id="sample-count-badge">显示 62 个样本</span>
+        <button class="refresh-btn" onclick="forceReload()">强制刷新音频缓存</button>
+      </div>
+    </div>
+
+    <div class="sample-grid" id="samples-container"></div>
+
+    <footer class="footer">
+      <p style="margin-bottom: 8px;">
+        <a href="https://github.com/vanch007/mlx-AuK" target="_blank" style="font-weight: 700; color: #58a6ff;">⭐ GitHub 源码仓库: vanch007/mlx-AuK</a> ·
+        <a href="https://huggingface.co/vanch007/AuK-Flash-MLX" target="_blank">🤗 Hugging Face 模型权重</a> ·
+        <a href="https://huggingface.co/vanch007/AuK-Flash-MLX-8bit" target="_blank">🗜️ 8-Bit 量化模型</a>
+      </p>
+      <p>
+        MLX-AuK · Native Apple Silicon Audio Foundation Model ·
+        <a href="https://github.com/Tencent-Hunyuan/AuK" target="_blank">Upstream Tencent-Hunyuan/AuK</a> ·
+        <a href="https://auk-project.github.io/" target="_blank">官方演示站</a>
+      </p>
+    </footer>
+  </main>
+
+  <script>
+    let catalogData = [];
+    let currentViewMode = "all"; // 'all', 'flash', 'base'
+
+    function switchViewMode(mode) {
+      currentViewMode = mode;
+      const btnAll = document.getElementById("btn-mode-all");
+      const btnFlash = document.getElementById("btn-mode-flash");
+      const btnBase = document.getElementById("btn-mode-base");
+      if (btnAll) btnAll.className = "view-pill-btn" + (mode === "all" ? " active" : "");
+      if (btnFlash) btnFlash.className = "view-pill-btn flash" + (mode === "flash" ? " active flash" : "");
+      if (btnBase) btnBase.className = "view-pill-btn base" + (mode === "base" ? " active base" : "");
+      renderSamples();
+    }
+    let currentFamily = "all";
+    let currentGroup = "all";
+    let searchQuery = "";
+    const sessionTime = Date.now();
+
+    async function init() {
+      try {
+        const res = await fetch("data.json?_t=" + sessionTime);
+        catalogData = await res.json();
+        buildNavigation();
+        renderSamples();
+      } catch(e) {
+        console.error("Failed to load data.json", e);
+      }
+
+      document.getElementById("search-input").addEventListener("input", (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        renderSamples();
+      });
+    }
+
+    function forceReload() {
+      location.href = location.pathname + "?_t=" + Date.now();
+    }
+
+    function buildNavigation() {
+      const famContainer = document.getElementById("family-pills");
+      catalogData.forEach(fam => {
+        let count = 0;
+        fam.groups.forEach(g => count += g.samples.length);
+
+        const btn = document.createElement("button");
+        btn.className = "pill-btn";
+        btn.dataset.family = fam.id;
+        btn.textContent = fam.name + " (" + count + ")";
+        btn.onclick = () => {
+          document.querySelectorAll(".pill-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentFamily = fam.id;
+          currentGroup = "all";
+          updateSubgroups(fam.id);
+          renderSamples();
+        };
+        famContainer.appendChild(btn);
+      });
+
+      updateSubgroups("all");
+    }
+
+    function updateSubgroups(familyId) {
+      const groupContainer = document.getElementById("group-pills");
+      groupContainer.innerHTML = "";
+
+      const allBtn = document.createElement("button");
+      allBtn.className = "sub-pill-btn active";
+      allBtn.textContent = "全部子类";
+      allBtn.onclick = () => {
+        document.querySelectorAll(".sub-pill-btn").forEach(b => b.classList.remove("active"));
+        allBtn.classList.add("active");
+        currentGroup = "all";
+        renderSamples();
+      };
+      groupContainer.appendChild(allBtn);
+
+      const targetGroups = [];
+      catalogData.forEach(fam => {
+        if (familyId === "all" || fam.id === familyId) {
+          fam.groups.forEach(g => targetGroups.push(g));
+        }
+      });
+
+      targetGroups.forEach(g => {
+        const btn = document.createElement("button");
+        btn.className = "sub-pill-btn";
+        btn.dataset.group = g.id;
+        btn.textContent = g.title + " (" + g.samples.length + ")";
+        btn.onclick = () => {
+          document.querySelectorAll(".sub-pill-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentGroup = g.id;
+          renderSamples();
+        };
+        groupContainer.appendChild(btn);
+      });
+    }
+
+    function renderTranscriptDiff(rawText, markRule) {
+      if (!rawText) return "";
+      let html = escapeHtml(rawText);
+      if (!markRule) return html;
+
+      if (markRule.change && Array.isArray(markRule.change)) {
+        markRule.change.slice().sort((a, b) => b.from.length - a.from.length).forEach(c => {
+          const fromEsc = escapeHtml(c.from);
+          const toEsc = escapeHtml(c.to);
+          const repHtml = '<mark class="tr-chg"><s>' + fromEsc + '</s> ➔ <b>' + toEsc + '</b></mark>';
+          html = html.split(fromEsc).join(repHtml);
+        });
+      }
+
+      if (markRule.delete && Array.isArray(markRule.delete)) {
+        markRule.delete.slice().sort((a, b) => b.length - a.length).forEach(delText => {
+          const delEsc = escapeHtml(delText);
+          const delHtml = '<mark class="tr-del"><del>' + delEsc + '</del></mark>';
+          html = html.split(delEsc).join(delHtml);
+        });
+      }
+
+      if (markRule.add && Array.isArray(markRule.add)) {
+        markRule.add.forEach(a => {
+          const addEsc = escapeHtml(a.text || a);
+          const addHtml = '<mark class="tr-add">+ ' + addEsc + '</mark>';
+          if (a.before && html.includes(escapeHtml(a.before))) {
+            const bEsc = escapeHtml(a.before);
+            html = html.split(bEsc).join(addHtml + ' ' + bEsc);
+          } else if (a.after && html.includes(escapeHtml(a.after))) {
+            const aftEsc = escapeHtml(a.after);
+            html = html.split(aftEsc).join(aftEsc + ' ' + addHtml);
+          } else {
+            html += ' ' + addHtml;
+          }
+        });
+      }
+
+      return html;
+    }
+
+    function renderSamples() {
+      const container = document.getElementById("samples-container");
+      container.innerHTML = "";
+
+      let visibleSamples = [];
+
+      catalogData.forEach(fam => {
+        if (currentFamily !== "all" && fam.id !== currentFamily) return;
+        fam.groups.forEach(grp => {
+          if (currentGroup !== "all" && grp.id !== currentGroup) return;
+          grp.samples.forEach(sample => {
+            const matchSearch = !searchQuery ||
+              sample.id.toLowerCase().includes(searchQuery) ||
+              sample.label.toLowerCase().includes(searchQuery) ||
+              (sample.voice_description && sample.voice_description.toLowerCase().includes(searchQuery)) ||
+              (sample.spoken_text && sample.spoken_text.toLowerCase().includes(searchQuery)) ||
+              (sample.instruction && sample.instruction.toLowerCase().includes(searchQuery));
+
+            if (matchSearch) {
+              visibleSamples.push({ sample, grp, fam });
+            }
+          });
+        });
+      });
+
+      document.getElementById("sample-count-badge").textContent = "显示 " + visibleSamples.length + " 个样本";
+
+      if (visibleSamples.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding: 60px 0; color:var(--text-muted);">没有匹配的测试样本</div>';
+        return;
+      }
+
+      visibleSamples.forEach(({ sample, grp, fam }) => {
+        const m = sample.metrics;
+        const mb = sample.base_metrics;
+        let rtfClass = m.rtf < 0.5 ? "tag-rtf-good" : (m.rtf < 1.0 ? "tag-rtf-ok" : "tag-rtf-warn");
+        let speedup = (1.0 / m.rtf).toFixed(2);
+        let rtfBadge = "⚡ Flash RTF: " + m.rtf.toFixed(3) + " (" + speedup + "x 超实时)";
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.id = "card-" + sample.id;
+
+        let officialSlotHtml = "";
+        let defaultTrackLabel = "";
+        let initialMarks = null;
+        let initialInstruction = sample.instruction;
+
+        if (sample.official_multi && sample.official_multi.length > 0) {
+          let activeIdx = 0;
+          for (let i = 0; i < sample.official_multi.length; i++) {
+            if (sample.official_multi[i].label !== "Input") {
+              activeIdx = i;
+              break;
+            }
+          }
+          const activeTrack = sample.official_multi[activeIdx];
+          defaultTrackLabel = activeTrack.label;
+
+          if (sample.transcriptMarks && sample.transcriptMarks[defaultTrackLabel]) {
+            initialMarks = sample.transcriptMarks[defaultTrackLabel];
+          } else if (sample.transcriptMarks && sample.transcriptMarks["Output"]) {
+            initialMarks = sample.transcriptMarks["Output"];
+          }
+
+          if (sample.nvInstructions && sample.nvInstructions[defaultTrackLabel]) {
+            initialInstruction = sample.nvInstructions[defaultTrackLabel];
+          }
+
+          officialSlotHtml = '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title official">[官方原版] <span id="label-tag-' + sample.id + '">' + activeTrack.label + '</span></span>' +
+            '</div>' +
+            '<audio controls preload="metadata" src="' + activeTrack.url + '?_t=' + sessionTime + '" id="audio-off-' + sample.id + '"></audio>' +
+            '<div class="multi-outputs">' +
+              sample.official_multi.map((item, idx) => `<button class="chip-btn ${idx===activeIdx?'active':''}" onclick="switchEditTrack('${sample.id}', '${item.url}', '${item.label}', this)">${item.label}</button>`).join("") +
+            '</div>' +
+          '</div>';
+        } else if (sample.official_audio) {
+          if (sample.transcriptMarks && sample.transcriptMarks["Output"]) {
+            initialMarks = sample.transcriptMarks["Output"];
+          }
+          officialSlotHtml = '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title official">[官方原版] 演示输出</span>' +
+            '</div>' +
+            '<audio controls preload="metadata" src="' + sample.official_audio + '?_t=' + sessionTime + '"></audio>' +
+          '</div>';
+        } else {
+          officialSlotHtml = '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title official">[官方原版] 输出</span>' +
+            '</div>' +
+            '<div style="font-size:12px; color:var(--text-muted); padding: 8px 12px; height:38px; display:flex; align-items:center; background:#0d1117; border-radius:6px; border:1px dashed #30363d;">无独立单轨 (滑块演示)</div>' +
+          '</div>';
+        }
+
+        let inputSlotHtml = sample.input_audio ?
+          '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title src">[参考原音频] 输入声音</span>' +
+            '</div>' +
+            '<audio controls preload="metadata" src="' + sample.input_audio + '?_t=' + sessionTime + '"></audio>' +
+          '</div>' :
+          '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title src">[输入状态]</span>' +
+            '</div>' +
+            '<div style="font-size:12px; color:var(--text-muted); padding: 8px 12px; height:38px; display:flex; align-items:center; background:#0d1117; border-radius:6px; border:1px dashed #30363d;">纯文本角色音色描述 (无参考音频)</div>' +
+          '</div>';
+
+        let flashUrl = sample.mlx_audio;
+        if (sample.mlx_multi && sample.mlx_multi.length > 0) {
+          const matchingMlx = sample.mlx_multi.find(t => t.label === defaultTrackLabel);
+          if (matchingMlx) flashUrl = matchingMlx.url;
+        }
+
+        let flashSlotHtml = '<div class="audio-slot">' +
+          '<div class="slot-header-row">' +
+            '<span class="slot-title mlx-flash">⚡ [本项目] MLX Flash (4步极速) <span id="mlx-tag-' + sample.id + '" style="font-size:11px; color:#7ee787; font-weight:normal;">' + (defaultTrackLabel ? '('+defaultTrackLabel+')' : '') + '</span></span>' +
+            '<span class="slot-meta-badge flash">RTF ' + m.rtf.toFixed(3) + ' · ' + m.latency.toFixed(2) + 's</span>' +
+          '</div>' +
+          '<audio controls preload="metadata" src="' + flashUrl + '?_t=' + sessionTime + '" id="audio-mlx-flash-' + sample.id + '"></audio>' +
+        '</div>';
+
+        let baseSlotHtml = "";
+        let baseUrl = sample.mlx_base_audio;
+        if (sample.mlx_base_multi && sample.mlx_base_multi.length > 0) {
+          const matchingBaseMlx = sample.mlx_base_multi.find(t => t.label === defaultTrackLabel);
+          if (matchingBaseMlx) baseUrl = matchingBaseMlx.url;
+        }
+        if (baseUrl) {
+          let mbText = mb ? ('RTF ' + mb.rtf.toFixed(3) + ' · ' + mb.latency.toFixed(2) + 's') : '高保真 32步';
+          baseSlotHtml = '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title mlx-base">🎯 [本项目] MLX Base (高保真 32步) <span id="mlx-base-tag-' + sample.id + '" style="font-size:11px; color:#79c0ff; font-weight:normal;">' + (defaultTrackLabel ? '('+defaultTrackLabel+')' : '') + '</span></span>' +
+              '<span class="slot-meta-badge base">' + mbText + '</span>' +
+            '</div>' +
+            '<audio controls preload="metadata" src="' + baseUrl + '?_t=' + sessionTime + '" id="audio-mlx-base-' + sample.id + '"></audio>' +
+          '</div>';
+        }
+
+        let promptRowsHtml = "";
+        let instrBoxLabel = "【操作指令】";
+        if (grp.id === "content-edit-speech" || grp.id === "vocal-edit") {
+          instrBoxLabel = "【自然语言编辑指令 (Speech Content Editing)】";
+        } else if (sample.voice_description) {
+          instrBoxLabel = "【音色/风格设定描述】";
+        }
+
+        promptRowsHtml += '<div class="prompt-row">' +
+          '<span class="prompt-label" id="instr-label-' + sample.id + '">' +
+            instrBoxLabel +
+            (grp.id === "content-edit-speech" ? '<span class="prompt-label-badge" id="badge-mode-' + sample.id + '">' + defaultTrackLabel + '</span>' : '') +
+          '</span>' +
+          '<div class="prompt-content" id="instr-text-' + sample.id + '" style="color:#58a6ff; font-weight:500;">' +
+            escapeHtml(initialInstruction || sample.instruction || (sample.voice_description || "保持原音频并应用声学转换")) +
+          '</div>' +
+        '</div>';
+
+        if (sample.spoken_text) {
+          let renderedTranscript = renderTranscriptDiff(sample.spoken_text, initialMarks);
+          let transLabel = grp.id === "content-edit-speech" ? "【台词修改对照 (Diff 标注)】" : "【朗读目标台词 (Spoken Content)】";
+          promptRowsHtml += '<div class="prompt-row">' +
+            '<span class="prompt-label">' + transLabel + '</span>' +
+            '<div class="prompt-text-highlight" id="transcript-view-' + sample.id + '">' + renderedTranscript + '</div>' +
+          '</div>';
+        }
+
+        if (grp.id === "separate-speech") {
+          let cInstr = (sample.nvInstructions && sample.nvInstructions["Output1 · content"]) || sample.instruction;
+          let nInstr = sample.nvInstructions && sample.nvInstructions["Output2 · number"];
+          promptRowsHtml = '<div class="prompt-row">' +
+            '<span class="prompt-label">【双人说话人分离指令 (双音路独立分离)】</span>' +
+            '<div class="prompt-content" style="color:#58a6ff; font-weight:500; display:flex; flex-direction:column; gap:4px;">' +
+              '<div><strong>🎙️ 音路 1 (按内容分离)：</strong>' + escapeHtml(cInstr) + '</div>' +
+              (nInstr ? ('<div><strong>🎙️ 音路 2 (按顺序分离)：</strong>' + escapeHtml(nInstr) + '</div>') : '') +
+            '</div>' +
+          '</div>';
+
+          inputSlotHtml = '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title src">[参考原音频] 原始混合对话</span>' +
+            '</div>' +
+            '<div style="font-size:11px; color:#8b949e; font-weight:600; margin-top:2px; margin-bottom:2px;">🎧 混合双人人声输入</div>' +
+            '<audio controls preload="metadata" src="' + sample.input_audio + '?_t=' + sessionTime + '"></audio>' +
+          '</div>';
+
+          officialSlotHtml = '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title official">[官方原版] (双路分离输出)</span>' +
+            '</div>' +
+            '<div style="font-size:11px; color:#f0883e; font-weight:600; margin-top:2px; margin-bottom:2px;">🎙️ 音路 1 (Output1 · 内容分离)</div>' +
+            '<audio controls preload="metadata" src="../assets/official_outputs/' + sample.id + '-content.wav?_t=' + sessionTime + '"></audio>' +
+            '<div style="font-size:11px; color:#f0883e; font-weight:600; margin-top:8px; margin-bottom:2px;">🎙️ 音路 2 (Output2 · 顺序分离)</div>' +
+            '<audio controls preload="metadata" src="../assets/official_outputs/' + sample.id + '-number.wav?_t=' + sessionTime + '"></audio>' +
+          '</div>';
+
+          flashSlotHtml = '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title mlx-flash">⚡ [本项目] MLX Flash (4步极速 · 双路分离)</span>' +
+              '<span class="slot-meta-badge flash">RTF ' + m.rtf.toFixed(3) + ' · ' + m.latency.toFixed(2) + 's</span>' +
+            '</div>' +
+            '<div style="font-size:11px; color:#7ee787; font-weight:600; margin-top:2px; margin-bottom:2px;">🎙️ 音路 1 (Output1 · 内容分离)</div>' +
+            '<audio controls preload="metadata" src="../outputs/all_62_samples/' + sample.id + '_content.wav?_t=' + sessionTime + '"></audio>' +
+            '<div style="font-size:11px; color:#7ee787; font-weight:600; margin-top:8px; margin-bottom:2px;">🎙️ 音路 2 (Output2 · 顺序分离)</div>' +
+            '<audio controls preload="metadata" src="../outputs/all_62_samples/' + sample.id + '_number.wav?_t=' + sessionTime + '"></audio>' +
+          '</div>';
+
+          let mbText = mb ? ('RTF ' + mb.rtf.toFixed(3) + ' · ' + mb.latency.toFixed(2) + 's') : '高保真 32步';
+          baseSlotHtml = '<div class="audio-slot">' +
+            '<div class="slot-header-row">' +
+              '<span class="slot-title mlx-base">🎯 [本项目] MLX Base (高保真 32步 · 双路分离)</span>' +
+              '<span class="slot-meta-badge base">' + mbText + '</span>' +
+            '</div>' +
+            '<div style="font-size:11px; color:#79c0ff; font-weight:600; margin-top:2px; margin-bottom:2px;">🎙️ 音路 1 (Output1 · 内容分离)</div>' +
+            '<audio controls preload="metadata" src="../outputs/all_62_samples_base/' + sample.id + '_content.wav?_t=' + sessionTime + '"></audio>' +
+            '<div style="font-size:11px; color:#79c0ff; font-weight:600; margin-top:8px; margin-bottom:2px;">🎙️ 音路 2 (Output2 · 顺序分离)</div>' +
+            '<audio controls preload="metadata" src="../outputs/all_62_samples_base/' + sample.id + '_number.wav?_t=' + sessionTime + '"></audio>' +
+          '</div>';
+        }
+
+        let slotsHtml = inputSlotHtml + officialSlotHtml;
+        if (currentViewMode === "all") {
+          slotsHtml += flashSlotHtml + baseSlotHtml;
+        } else if (currentViewMode === "flash") {
+          slotsHtml += flashSlotHtml;
+        } else if (currentViewMode === "base") {
+          slotsHtml += (baseSlotHtml || flashSlotHtml);
+        }
+
+        let baseTagHtml = "";
+        if (mb) {
+          let baseSpeedup = (1.0 / mb.rtf).toFixed(2);
+          let baseTagClass = mb.rtf < 1.0 ? "tag-rtf-good" : "tag-rtf-blue";
+          baseTagHtml = '<span class="tag ' + baseTagClass + '">🎯 Base RTF: ' + mb.rtf.toFixed(3) + ' (' + (mb.rtf < 1.0 ? baseSpeedup + 'x' : '高保真') + ')</span>';
+        }
+
+        card.innerHTML = '<div class="card-header">' +
+          '<div class="card-title"><span>' + grp.title + '</span><span style="font-size:13px; color:var(--text-muted); font-weight:normal;">/ ' + sample.label + '</span></div>' +
+          '<div class="card-meta">' +
+            '<span class="tag ' + rtfClass + '">' + rtfBadge + '</span>' +
+            baseTagHtml +
+            '<span class="tag tag-neutral">音频时长: ' + m.duration.toFixed(2) + 's</span>' +
+            '<span class="tag tag-neutral">Flash耗时: ' + m.latency.toFixed(2) + 's</span>' +
+            (mb ? '<span class="tag tag-neutral">Base耗时: ' + mb.latency.toFixed(2) + 's</span>' : '') +
+            '<span class="tag tag-neutral">RMS: ' + m.rms.toFixed(4) + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="prompt-box">' + promptRowsHtml + '</div>' +
+        '<div class="audio-comparison-grid">' + slotsHtml + '</div>';
+
+        container.appendChild(card);
+      });
+    }
+
+    function switchEditTrack(sampleId, url, trackLabel, btn) {
+      // 1. Play official audio
+      const audio = document.getElementById("audio-off-" + sampleId);
+      if (audio) {
+        audio.src = url;
+        audio.play();
+      }
+
+      btn.parentElement.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      let currentSample = null;
+      catalogData.forEach(fam => {
+        fam.groups.forEach(g => {
+          g.samples.forEach(s => {
+            if (s.id === sampleId) currentSample = s;
+          });
+        });
+      });
+
+      if (!currentSample) return;
+
+      // 2. Synchronously switch MLX audio players (both Flash and Base)!
+      const mlxAudio = document.getElementById("audio-mlx-flash-" + sampleId) || document.getElementById("audio-mlx-" + sampleId);
+      const mlxTag = document.getElementById("mlx-tag-" + sampleId);
+      if (mlxAudio && currentSample.mlx_multi) {
+        const targetMlx = currentSample.mlx_multi.find(t => t.label === trackLabel);
+        if (targetMlx) {
+          mlxAudio.src = targetMlx.url + "?_t=" + Date.now();
+          if (mlxTag) mlxTag.textContent = "(" + trackLabel + ")";
+        }
+      }
+
+      const mlxBaseAudio = document.getElementById("audio-mlx-base-" + sampleId);
+      const mlxBaseTag = document.getElementById("mlx-base-tag-" + sampleId);
+      if (mlxBaseAudio && currentSample.mlx_base_multi) {
+        const targetBaseMlx = currentSample.mlx_base_multi.find(t => t.label === trackLabel);
+        if (targetBaseMlx) {
+          mlxBaseAudio.src = targetBaseMlx.url + "?_t=" + Date.now();
+          if (mlxBaseTag) mlxBaseTag.textContent = "(" + trackLabel + ")";
+        }
+      }
+
+      const tag = document.getElementById("label-tag-" + sampleId);
+      if (tag) tag.textContent = trackLabel;
+
+      const badge = document.getElementById("badge-mode-" + sampleId);
+      if (badge) badge.textContent = trackLabel;
+
+      const instrText = document.getElementById("instr-text-" + sampleId);
+      if (instrText) {
+        if (currentSample.nvInstructions && currentSample.nvInstructions[trackLabel]) {
+          instrText.textContent = currentSample.nvInstructions[trackLabel];
+        } else if (trackLabel === "Input") {
+          instrText.textContent = "原始未编辑音频输入";
+        } else {
+          instrText.textContent = currentSample.instruction || "执行 " + trackLabel;
+        }
+      }
+
+      const transView = document.getElementById("transcript-view-" + sampleId);
+      if (transView && currentSample.spoken_text) {
+        let marks = null;
+        if (currentSample.transcriptMarks && currentSample.transcriptMarks[trackLabel]) {
+          marks = currentSample.transcriptMarks[trackLabel];
+        }
+        transView.innerHTML = renderTranscriptDiff(currentSample.spoken_text, marks);
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return "";
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    window.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
